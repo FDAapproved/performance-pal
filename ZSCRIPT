@@ -1,0 +1,67 @@
+Version "4.6"
+
+class PerformancePalEvent : eventhandler
+{
+	// Actors to always delete. 
+	static const class<actor> blacklist[] =
+	{
+	"HDSmoke",
+	"BloodTrail",
+	"CheckPuff",
+	"WallChunk",
+	"HDBulletPuff",
+	"HDFireballTail",
+	"ReverseImpBallTail",
+	"HDSmokeChunk"
+	};
+	
+	// Actors to only sometimes delete. 
+	static const class<actor> halflist[] =
+	{
+		"ShieldSpark",
+		"HDFlameRed",
+		"HDMasterBlood",
+		"PlantBit"
+	};
+	
+	// Flips each time something that would be deleted 50% of the time is found.
+	bool flipflop;
+	
+
+	override void worldthingspawned(WorldEvent e)
+	{
+	
+
+		
+		// in case it's not real. 
+		if(!e.thing)
+		{
+			return;
+		}
+		
+		// Classes to only delete half of the time. 
+		for(int i = 0; (i < halflist.size()) && e.thing; i++)
+		{
+			if (e.thing is halflist[i])
+			{
+				if(flipflop)
+				{
+					e.thing.destroy();
+				}
+				flipflop = !flipflop;
+				return;
+			}
+		}
+		
+		// Classes to delete 100% of the time. 
+		for(int j = 0; (j < blacklist.size()) && e.thing; j++)
+		{
+			if(e.thing is blacklist[j])
+			{
+				e.thing.destroy();
+				return;
+			}
+		}
+
+	}
+}
